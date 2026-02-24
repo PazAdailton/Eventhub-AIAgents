@@ -77,7 +77,7 @@ app.get('/api/health', async (req, res) => {
 // ─── Public config (feature flags) ───────────────────────────────────────────
 /**
  * @swagger
- * /api/config:
+ * /config:
  *   get:
  *     summary: Get public feature flags
  *     tags: [Config]
