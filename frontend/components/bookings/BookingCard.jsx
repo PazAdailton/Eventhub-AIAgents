@@ -41,17 +41,20 @@ export default function BookingCard({ booking }) {
 
   return (
     <>
-      <div data-testid="booking-card" className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition-shadow">
+      <div data-testid="booking-card" id="booking-card" className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition-shadow">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
             {/* Ref + status */}
             <div className="flex items-center gap-2 flex-wrap mb-2">
-              <span className="font-mono text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">
+              <span className="booking-ref font-mono text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">
                 {booking.bookingRef}
               </span>
               <Badge variant={booking.status === 'confirmed' ? 'success' : 'danger'}>
                 {booking.status}
               </Badge>
+              <span data-testid="booking-id" id="booking-id" className="font-mono text-xs text-gray-400">
+                #{booking.id}
+              </span>
             </div>
 
             <h3 className="font-semibold text-gray-900 text-base truncate mb-1">
@@ -77,7 +80,7 @@ export default function BookingCard({ booking }) {
             <Button variant="secondary" size="sm">View Details</Button>
           </Link>
           {booking.status === 'confirmed' && (
-            <Button data-testid="cancel-booking-btn" variant="danger" size="sm" onClick={() => setConfirm(true)}>
+            <Button data-testid="cancel-booking-btn" id="cancel-booking-btn" variant="danger" size="sm" onClick={() => setConfirm(true)}>
               Cancel Booking
             </Button>
           )}

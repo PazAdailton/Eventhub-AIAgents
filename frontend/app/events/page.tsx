@@ -72,6 +72,16 @@ function EventsContent() {
 
   return (
     <>
+      {events.length > 5 && (
+        <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 mb-6 text-sm text-amber-800">
+          <svg className="w-4 h-4 shrink-0 mt-0.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>
+            Your sandbox holds up to <strong className="mx-1">9 bookings</strong> and you can create up to <strong className="mx-1">6 custom events</strong>. When either limit is reached, the oldest entry is automatically replaced.
+          </span>
+        </div>
+      )}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
         {events.map((event: any) => <EventCard key={event.id} event={event} />)}
       </div>
@@ -93,14 +103,6 @@ export default function EventsPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Upcoming Events</h1>
         <p className="text-gray-500 mt-1">Find your next unforgettable experience</p>
-        <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 mt-4 text-sm text-amber-800">
-          <svg className="w-4 h-4 shrink-0 mt-0.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span>
-            Your sandbox holds up to <strong className="mx-1">9 bookings</strong> and you can create up to <strong className="mx-1">6 custom events</strong>. When either limit is reached, the oldest entry is automatically replaced.
-          </span>
-        </div>
       </div>
 
       {/* Filters need Suspense because they call useSearchParams */}

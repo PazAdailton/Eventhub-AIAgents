@@ -53,7 +53,7 @@ export default function EventCard({ event }) {
   const soldOut = event.availableSeats === 0;
 
   return (
-    <article data-testid="event-card" className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow group flex flex-col">
+    <article data-testid="event-card" id="event-card" className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow group flex flex-col">
       {/* Image */}
       <div className="relative h-48 bg-gradient-to-br from-indigo-100 via-purple-50 to-indigo-200 overflow-hidden shrink-0">
         {event.imageUrl ? (
@@ -108,7 +108,7 @@ export default function EventCard({ event }) {
           <Link
             href={`/events/${event.id}`}
             aria-disabled={soldOut}
-            data-testid="book-now-btn"
+            data-testid="book-now-btn" id="book-now-btn"
             className={`
               px-4 py-2 rounded-lg text-sm font-semibold transition-colors
               ${soldOut

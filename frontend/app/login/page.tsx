@@ -13,14 +13,18 @@ const FEATURES = [
   { icon: '🤖', text: 'Built for Selenium, Playwright, RestAssured & more' },
 ];
 
+// Demo credentials used in sample tests — block these to nudge users to create their own
+const DEMO_EMAILS = ['rahulshetty1@gmail.com', 'rahulshetty1@yahoo.com'];
+
 export default function LoginPage() {
   const { login } = useAuth();
   const toast = useToast();
-  const [email,    setEmail]    = useState('');
-  const [password, setPassword] = useState('');
-  const [errors,   setErrors]   = useState<{ email?: string; password?: string }>({});
-  const [loading,  setLoading]  = useState(false);
-  const [showLinks, setShowLinks] = useState(false);
+  const [email,       setEmail]       = useState('');
+  const [password,    setPassword]    = useState('');
+  const [errors,      setErrors]      = useState<{ email?: string; password?: string }>({});
+  const [loading,     setLoading]     = useState(false);
+  const [demoWarning, setDemoWarning] = useState(false);
+  const [showLinks,   setShowLinks]   = useState(false);
 
   useEffect(() => {
     fetch(`${BASE_URL}/config`)
@@ -38,6 +42,7 @@ export default function LoginPage() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setDemoWarning(false);
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setErrors({});
@@ -45,7 +50,12 @@ export default function LoginPage() {
     try {
       await login(email, password);
     } catch (err: any) {
-      toast(err.message || 'Login failed', 'error');
+      // If login fails and the email is a demo credential, show a helpful nudge instead
+      if (DEMO_EMAILS.includes(email.trim().toLowerCase())) {
+        setDemoWarning(true);
+      } else {
+        toast(err.message || 'Login failed', 'error');
+      }
     } finally {
       setLoading(false);
     }
@@ -187,9 +197,10 @@ export default function LoginPage() {
 
             <form onSubmit={submit} noValidate className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                 <input
-                  data-testid="login-email"
+                  id="email"
+                  name="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -200,9 +211,10 @@ export default function LoginPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password</label>
                 <input
-                  data-testid="login-password"
+                  id="password"
+                  name="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -212,11 +224,24 @@ export default function LoginPage() {
                 {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password}</p>}
               </div>
 
+              {demoWarning && (
+                <div className="rounded-lg bg-amber-50 border border-amber-300 px-4 py-3 text-sm text-amber-800 leading-relaxed">
+                  <p className="font-semibold mb-1">⚠️ Looks like you're using sample test credentials!</p>
+                  <p>
+                    Looks like you are directly running tests without changing credentials.{' '}
+                    <Link href="/register" className="font-semibold underline hover:text-amber-900">
+                      Sign up now
+                    </Link>{' '}
+                    to create your own login credentials, update them in the test &amp; run again. Good luck! 🚀
+                  </p>
+                </div>
+              )}
+
               <button
-                data-testid="login-btn"
+                id="login-btn"
                 type="submit"
                 disabled={loading}
-                className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                className="login-submit-btn w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {loading ? 'Signing in…' : 'Sign In'}
               </button>

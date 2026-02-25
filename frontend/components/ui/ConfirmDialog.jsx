@@ -20,7 +20,7 @@ export default function ConfirmDialog({
         <Button variant="secondary" onClick={onClose} disabled={isLoading}>
           {cancelLabel}
         </Button>
-        <Button data-testid="confirm-dialog-yes" variant={variant} onClick={onConfirm} loading={isLoading}>
+        <Button data-testid="confirm-dialog-yes" id="confirm-dialog-yes" variant={variant} onClick={onConfirm} loading={isLoading}>
           {confirmLabel}
         </Button>
       </div>

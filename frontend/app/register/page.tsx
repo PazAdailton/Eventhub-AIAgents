@@ -21,10 +21,19 @@ export default function RegisterPage() {
   const [errors,   setErrors]   = useState<{ email?: string; password?: string; confirm?: string }>({});
   const [loading,  setLoading]  = useState(false);
 
+  const PASSWORD_RULES = [
+    { label: 'At least 8 characters',             test: (p: string) => p.length >= 8 },
+    { label: 'One uppercase letter (A–Z)',         test: (p: string) => /[A-Z]/.test(p) },
+    { label: 'One number (0–9)',                   test: (p: string) => /[0-9]/.test(p) },
+    { label: 'One special character (!@#$%^&*…)',  test: (p: string) => /[^A-Za-z0-9]/.test(p) },
+  ];
+
+  const isStrongPassword = (p: string) => PASSWORD_RULES.every(r => r.test(p));
+
   const validate = () => {
     const e: { email?: string; password?: string; confirm?: string } = {};
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = 'Enter a valid email';
-    if (!password || password.length < 6) e.password = 'Password must be at least 6 characters';
+    if (!password || !isStrongPassword(password)) e.password = 'Password does not meet the requirements below';
     if (password !== confirm) e.confirm = 'Passwords do not match';
     return e;
   };
@@ -170,7 +179,7 @@ export default function RegisterPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                 <input
-                  data-testid="register-email"
+                  data-testid="register-email" id="register-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -183,13 +192,30 @@ export default function RegisterPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
                 <input
-                  data-testid="register-password"
+                  data-testid="register-password" id="register-password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Min 6 characters"
+                  placeholder="Min 8 chars, uppercase, number & symbol"
                   className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 />
+                {/* Password strength guidelines */}
+                <ul className="mt-2 space-y-1" id="password-guidelines">
+                  {PASSWORD_RULES.map(({ label, test }) => {
+                    const passed = password.length > 0 && test(password);
+                    return (
+                      <li key={label} className={`flex items-center gap-1.5 text-xs ${passed ? 'text-emerald-600' : 'text-gray-400'}`}>
+                        <svg className="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          {passed
+                            ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                            : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0-8 0" />
+                          }
+                        </svg>
+                        {label}
+                      </li>
+                    );
+                  })}
+                </ul>
                 {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password}</p>}
               </div>
 
@@ -206,7 +232,7 @@ export default function RegisterPage() {
               </div>
 
               <button
-                data-testid="register-btn"
+                data-testid="register-btn" id="register-btn"
                 type="submit"
                 disabled={loading}
                 className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"

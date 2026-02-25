@@ -109,7 +109,7 @@ export default function AdminEventsPage() {
                   </thead>
                   <tbody className="divide-y divide-gray-50">
                     {events.map((event: any) => (
-                      <tr key={event.id} data-testid="event-table-row" className="hover:bg-gray-50/70 transition-colors">
+                      <tr key={event.id} data-testid="event-table-row" id="event-table-row" className="hover:bg-gray-50/70 transition-colors">
                         <td className="px-4 py-3.5 font-medium text-gray-900 max-w-[220px] truncate">
                           <span>{event.title}</span>
                           {event.isStatic && (
@@ -143,14 +143,14 @@ export default function AdminEventsPage() {
                           ) : (
                             <div className="flex items-center gap-2">
                               <Button
-                                data-testid="edit-event-btn"
+                                data-testid="edit-event-btn" id="edit-event-btn"
                                 variant="ghost" size="sm"
                                 onClick={() => handleEdit(event)}
                               >
                                 Edit
                               </Button>
                               <Button
-                                data-testid="delete-event-btn"
+                                data-testid="delete-event-btn" id="delete-event-btn"
                                 variant="danger" size="sm"
                                 onClick={() => setDeletingId(event.id)}
                               >

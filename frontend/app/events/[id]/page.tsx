@@ -37,7 +37,7 @@ function BookingConfirmation({ booking }: { booking: any }) {
 
       <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4 mb-5 text-left space-y-2">
         <Row label="Booking Ref">
-          <span data-testid="booking-ref" className="font-mono font-bold text-indigo-600">{booking.data?.bookingRef}</span>
+          <span className="booking-ref font-mono font-bold text-indigo-600">{booking.data?.bookingRef}</span>
         </Row>
         <Row label="Customer">{booking.data?.customerName}</Row>
         <Row label="Tickets">{booking.data?.quantity}</Row>
@@ -121,7 +121,7 @@ function BookingForm({ event }: { event: any }) {
             className="w-9 h-9 rounded-lg border border-gray-300 flex items-center justify-center text-lg font-bold hover:bg-gray-100 transition-colors disabled:opacity-40"
             disabled={form.quantity <= 1}
           >−</button>
-          <span data-testid="quantity-input" className="w-8 text-center font-semibold text-lg">{form.quantity}</span>
+          <span id="ticket-count" className="ticket-count w-8 text-center font-semibold text-lg">{form.quantity}</span>
           <button
             type="button"
             onClick={() => setForm((f) => ({ ...f, quantity: Math.min(maxQty, f.quantity + 1) }))}
@@ -133,9 +133,9 @@ function BookingForm({ event }: { event: any }) {
         {errors.quantity && <p className="text-xs text-red-600">{errors.quantity}</p>}
       </div>
 
-      <Input data-testid="customer-name"  label="Full Name"     required value={form.customerName}  onChange={set('customerName')}  error={errors.customerName}  placeholder="Your full name" />
-      <Input data-testid="customer-email" label="Email"         required type="email" value={form.customerEmail} onChange={set('customerEmail')} error={errors.customerEmail} placeholder="you@email.com" />
-      <Input data-testid="customer-phone" label="Phone Number"  required type="tel"   value={form.customerPhone} onChange={set('customerPhone')} error={errors.customerPhone} placeholder="+91 98765 43210" />
+      <Input id="customerName"  name="customerName"  label="Full Name"    required value={form.customerName}  onChange={set('customerName')}  error={errors.customerName}  placeholder="Your full name" />
+      <Input data-testid="customer-email" id="customer-email" name="customerEmail" label="Email"        required type="email" value={form.customerEmail} onChange={set('customerEmail')} error={errors.customerEmail} placeholder="you@email.com" />
+      <Input id="phone"         name="phone"         label="Phone Number" required type="tel"   value={form.customerPhone} onChange={set('customerPhone')} error={errors.customerPhone} placeholder="+91 98765 43210" />
 
       {/* Price summary */}
       <div className="bg-indigo-50 rounded-xl p-4 space-y-1.5 text-sm border border-indigo-100">
@@ -149,7 +149,7 @@ function BookingForm({ event }: { event: any }) {
         </div>
       </div>
 
-      <Button data-testid="confirm-booking-btn" type="submit" loading={isPending} className="w-full" size="lg" disabled={soldOut}>
+      <Button id="confirm-booking" type="submit" loading={isPending} className="confirm-booking-btn w-full" size="lg" disabled={soldOut}>
         {soldOut ? 'Sold Out' : 'Confirm Booking'}
       </Button>
     </form>

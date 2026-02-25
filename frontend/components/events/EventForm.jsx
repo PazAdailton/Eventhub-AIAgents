@@ -101,10 +101,10 @@ export default function EventForm({ event = null, onSuccess }) {
   };
 
   return (
-    <form data-testid="admin-event-form" onSubmit={handleSubmit} noValidate className="space-y-4">
+    <form data-testid="admin-event-form" id="admin-event-form" onSubmit={handleSubmit} noValidate className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Input
-          data-testid="event-title-input"
+          data-testid="event-title-input" id="event-title-input"
           label="Title" required
           value={form.title} onChange={set('title')} error={errors.title}
           placeholder="Event title"
@@ -163,7 +163,7 @@ export default function EventForm({ event = null, onSuccess }) {
       </div>
 
       <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
-        <Button data-testid="add-event-btn" type="submit" loading={pending}>
+        <Button data-testid="add-event-btn" id="add-event-btn" type="submit" loading={pending}>
           {isEditing ? '💾 Update Event' : '+ Add Event'}
         </Button>
         {isEditing && (

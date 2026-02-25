@@ -32,6 +32,13 @@ const bookingRepository = {
     });
   },
 
+  async findByIdOnly(id) {
+    return prisma.booking.findUnique({
+      where:   { id: Number(id) },
+      include: { event: true },
+    });
+  },
+
   async findByRef(bookingRef) {
     return prisma.booking.findUnique({
       where:   { bookingRef },

@@ -17,6 +17,59 @@ const fmt_date  = (iso: string) =>
 const fmt_price = (n: number) =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
 
+// ── Refund Eligibility ────────────────────────────────────────────────────────
+function RefundEligibility({ quantity }: { quantity: number }) {
+  const [status, setStatus] = useState<'idle' | 'checking' | 'eligible' | 'ineligible'>('idle');
+
+  const check = () => {
+    setStatus('checking');
+    setTimeout(() => {
+      setStatus(quantity === 1 ? 'eligible' : 'ineligible');
+    }, 4000);
+  };
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+      <h2 className="text-base font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-100">Refund</h2>
+
+      {status === 'idle' && (
+        <button
+          data-testid="check-refund-btn" id="check-refund-btn"
+          onClick={check}
+          className="text-sm text-indigo-600 hover:underline"
+        >
+          Check eligibility for refund?
+        </button>
+      )}
+
+      {status === 'checking' && (
+        <div data-testid="refund-spinner" id="refund-spinner" className="flex items-center gap-3 text-sm text-gray-500">
+          <Spinner size="sm" />
+          <span>Checking your refund eligibility…</span>
+        </div>
+      )}
+
+      {status === 'eligible' && (
+        <div data-testid="refund-result" id="refund-result" className="flex items-start gap-2.5 text-sm text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3">
+          <svg className="w-4 h-4 shrink-0 mt-0.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+          <span><strong>Eligible for refund.</strong> Single-ticket bookings qualify for a full refund.</span>
+        </div>
+      )}
+
+      {status === 'ineligible' && (
+        <div data-testid="refund-result" id="refund-result" className="flex items-start gap-2.5 text-sm text-red-800 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+          <svg className="w-4 h-4 shrink-0 mt-0.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+          <span><strong>Not eligible for refund.</strong> Group bookings ({quantity} tickets) are non-refundable.</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function DetailSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
@@ -41,7 +94,7 @@ export default function BookingDetailPage() {
   const toast    = useToast();
   const [confirm, setConfirm] = useState(false);
 
-  const { data, isLoading, isError } = useBooking(id);
+  const { data, isLoading, isError, error } = useBooking(id);
   const booking = data?.data;
   const { mutate: cancel, isPending } = useCancelBooking();
 
@@ -62,7 +115,20 @@ export default function BookingDetailPage() {
     return <div className="flex items-center justify-center min-h-[60vh]"><Spinner size="lg" /></div>;
   }
 
-  if (isError || !booking) {
+  if (isError) {
+    const is403 = (error as any)?.status === 403;
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-20">
+        <EmptyState
+          title={is403 ? 'Access Denied' : 'Booking not found'}
+          description={is403 ? 'You are not authorized to view this booking.' : "This booking doesn't exist or may have been cancelled."}
+          action={<Link href="/bookings"><Button>View My Bookings</Button></Link>}
+        />
+      </div>
+    );
+  }
+
+  if (!booking) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-20">
         <EmptyState
@@ -128,6 +194,9 @@ export default function BookingDetailPage() {
               <span className="text-lg font-bold text-indigo-700">{fmt_price(booking.totalPrice)}</span>
             </div>
           </DetailSection>
+
+          {/* Refund eligibility */}
+          <RefundEligibility quantity={booking.quantity} />
 
           {/* Metadata */}
           <DetailSection title="Booking Information">

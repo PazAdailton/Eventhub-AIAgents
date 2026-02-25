@@ -51,9 +51,9 @@ export default function Navbar() {
 
           {/* ── Desktop nav ───────────────────────────────────────────────── */}
           <div className="hidden md:flex items-center gap-1">
-            <NavLink href="/"         active={isActive('/')}         data-testid="nav-home">Home</NavLink>
-            <NavLink href="/events"   active={isActive('/events')}   data-testid="nav-events">Events</NavLink>
-            <NavLink href="/bookings" active={isActive('/bookings')} data-testid="nav-bookings">My Bookings</NavLink>
+            <NavLink href="/"         active={isActive('/')}         data-testid="nav-home" id="nav-home">Home</NavLink>
+            <NavLink href="/events"   active={isActive('/events')}   data-testid="nav-events" id="nav-events">Events</NavLink>
+            <NavLink href="/bookings" active={isActive('/bookings')} data-testid="nav-bookings" id="nav-bookings">My Bookings</NavLink>
             <a
               href={`${BASE_URL}/docs`}
               target="_blank"
@@ -108,14 +108,14 @@ export default function Navbar() {
             {user && (
               <div className="flex items-center gap-2 ml-2 pl-2 border-l border-gray-200">
                 <span
-                  data-testid="user-email-display"
+                  data-testid="user-email-display" id="user-email-display"
                   className="text-xs text-gray-500 max-w-[120px] truncate"
                   title={user.email}
                 >
                   {user.email}
                 </span>
                 <button
-                  data-testid="logout-btn"
+                  data-testid="logout-btn" id="logout-btn"
                   onClick={logout}
                   className="px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                 >
@@ -175,11 +175,11 @@ export default function Navbar() {
           </a>
           {user && (
             <>
-              <div className="px-3 py-2 text-xs text-gray-400 truncate" data-testid="user-email-display">
+              <div className="px-3 py-2 text-xs text-gray-400 truncate" data-testid="user-email-display" id="user-email-display">
                 {user.email}
               </div>
               <button
-                data-testid="logout-btn"
+                data-testid="logout-btn" id="logout-btn"
                 onClick={() => { setMobileOpen(false); logout(); }}
                 className="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
               >

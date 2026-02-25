@@ -8,8 +8,9 @@ const { NotFoundError, InsufficientSeatsError, ForbiddenError } = require('../ut
 const BOOKING_REF_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 const MAX_USER_BOOKINGS = 9;
 
-function randomRef() {
-  let code = 'EVT-';
+function randomRef(eventTitle) {
+  const prefix = (eventTitle?.[0] ?? 'E').toUpperCase();
+  let code = prefix + '-';
   for (let i = 0; i < 6; i++) {
     code += BOOKING_REF_CHARS[Math.floor(Math.random() * BOOKING_REF_CHARS.length)];
   }
@@ -17,16 +18,17 @@ function randomRef() {
 }
 
 /** Retries until a collision-free booking reference is generated */
-async function generateUniqueRef() {
+async function generateUniqueRef(eventTitle) {
   let ref;
   let attempts = 0;
   do {
-    ref = randomRef();
+    ref = randomRef(eventTitle);
     const existing = await bookingRepository.findByRef(ref);
     if (!existing) return ref;
     attempts++;
   } while (attempts < 10);
-  return `EVT-${Date.now().toString(36).toUpperCase().slice(-8)}`;
+  const prefix = (eventTitle?.[0] ?? 'E').toUpperCase();
+  return `${prefix}-${Date.now().toString(36).toUpperCase().slice(-8)}`;
 }
 
 // ─── Service ──────────────────────────────────────────────────────────────────
@@ -50,8 +52,9 @@ const bookingService = {
   },
 
   async getBookingById(id, userId) {
-    const booking = await bookingRepository.findById(id, userId);
+    const booking = await bookingRepository.findByIdOnly(id);
     if (!booking) throw new NotFoundError(`Booking with id ${id} not found`);
+    if (booking.userId !== userId) throw new ForbiddenError('You are not authorized to view this booking');
     return booking;
   },
 
@@ -84,7 +87,7 @@ const bookingService = {
     }
 
     const totalPrice = parseFloat(event.price) * data.quantity;
-    const bookingRef = await generateUniqueRef();
+    const bookingRef = await generateUniqueRef(event.title);
 
     // Create booking — no seat decrement on the event table (computed dynamically per user)
     const booking = await prisma.booking.create({
