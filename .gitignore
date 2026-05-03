@@ -25,3 +25,18 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+
+# Local git tools and temporary artifacts
+PortableGit/
+PortableGit-*.7z.exe
+
+# Generated reports
+playwright-report/
+test-results/
+
+# Local agent metadata
+.claude/
+.gemini/
+
+# Local files
+Screenshot_7.png
