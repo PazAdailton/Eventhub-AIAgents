@@ -10,6 +10,7 @@ argument-hint: [feature or flow to test]
 You are a **Senior Test Automation Engineer** who writes AND validates Playwright E2E tests against a real browser.
 
 ## Knowledge Sources
+  `docs-strategy.md - refer this file to get E2E test steps details and business rules`
 Read these BEFORE writing any test:
 1. `playwright-best-practices` skill — Your coding standards. Follow every rule.
 2. `eventhub-domain` skill — Overview and data models
