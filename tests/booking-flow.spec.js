@@ -24,18 +24,24 @@ async function login(page) {
   await expect(page).toHaveURL('/');
 }
 
-async function ensureBookingExists(page) {
-  await page.goto('/bookings');
-  
-  // Wait for either the list to load or the empty state to appear
+/**
+ * Waits for the bookings list page to finish loading (skeletons disappear).
+ */
+async function waitForBookingsToLoad(page) {
   const bookingCards = page.getByTestId('booking-card');
   const emptyState = page.getByText('No bookings yet');
   
   await Promise.race([
-    bookingCards.first().waitFor({ state: 'visible' }).catch(() => {}),
-    emptyState.waitFor({ state: 'visible' }).catch(() => {})
+    bookingCards.first().waitFor({ state: 'visible', timeout: 10000 }).catch(() => {}),
+    emptyState.waitFor({ state: 'visible', timeout: 10000 }).catch(() => {})
   ]);
+}
 
+async function ensureBookingExists(page) {
+  await page.goto('/bookings');
+  await waitForBookingsToLoad(page);
+
+  const bookingCards = page.getByTestId('booking-card');
   if (await bookingCards.count() === 0) {
     await page.goto('/events');
     const bookBtn = page.getByTestId('book-now-btn').first();
@@ -51,6 +57,7 @@ async function ensureBookingExists(page) {
     // Wait for confirmation
     await expect(page.locator('.booking-ref').first()).toBeVisible();
     await page.goto('/bookings');
+    await waitForBookingsToLoad(page);
     await expect(page.getByTestId('booking-card').first()).toBeVisible();
   }
 }
@@ -63,6 +70,7 @@ test.describe('Booking Flow E2E', () => {
 
   test('TC-001: View bookings list with existing bookings', async ({ page }) => {
     await page.goto('/bookings');
+    await waitForBookingsToLoad(page);
     
     // Assert cards are rendered using data-testid
     const bookingCards = page.getByTestId('booking-card');
@@ -75,6 +83,7 @@ test.describe('Booking Flow E2E', () => {
 
   test('TC-002: View single booking detail page', async ({ page }) => {
     await page.goto('/bookings');
+    await waitForBookingsToLoad(page);
     
     // Capture the ref from the first card to verify it on detail page
     const firstCard = page.getByTestId('booking-card').first();
@@ -96,6 +105,7 @@ test.describe('Booking Flow E2E', () => {
 
   test('TC-003: Cancel a single booking from detail page', async ({ page }) => {
     await page.goto('/bookings');
+    await waitForBookingsToLoad(page);
     
     // Go to first booking detail
     await page.getByRole('link', { name: 'View Details' }).first().click();
