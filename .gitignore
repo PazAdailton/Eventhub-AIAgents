@@ -40,3 +40,9 @@ test-results/
 
 # Local files
 Screenshot_7.png
+
+# Playwright
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
