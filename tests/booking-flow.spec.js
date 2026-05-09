@@ -26,11 +26,21 @@ async function login(page) {
 
 async function ensureBookingExists(page) {
   await page.goto('/bookings');
-  const bookingCards = page.getByTestId('booking-card');
   
+  // Wait for either the list to load or the empty state to appear
+  const bookingCards = page.getByTestId('booking-card');
+  const emptyState = page.getByText('No bookings yet');
+  
+  await Promise.race([
+    bookingCards.first().waitFor({ state: 'visible' }).catch(() => {}),
+    emptyState.waitFor({ state: 'visible' }).catch(() => {})
+  ]);
+
   if (await bookingCards.count() === 0) {
     await page.goto('/events');
-    await page.getByTestId('book-now-btn').first().click();
+    const bookBtn = page.getByTestId('book-now-btn').first();
+    await expect(bookBtn).toBeVisible();
+    await bookBtn.click();
     
     // Fill booking form
     await page.getByLabel('Full Name').fill('Test User');
@@ -39,8 +49,9 @@ async function ensureBookingExists(page) {
     await page.locator('.confirm-booking-btn').click();
     
     // Wait for confirmation
-    await expect(page.locator('.booking-ref')).toBeVisible();
+    await expect(page.locator('.booking-ref').first()).toBeVisible();
     await page.goto('/bookings');
+    await expect(page.getByTestId('booking-card').first()).toBeVisible();
   }
 }
 
@@ -66,10 +77,12 @@ test.describe('Booking Flow E2E', () => {
     await page.goto('/bookings');
     
     // Capture the ref from the first card to verify it on detail page
-    const firstCardRef = await page.locator('#booking-card .booking-ref').first().textContent();
+    const firstCard = page.getByTestId('booking-card').first();
+    await expect(firstCard).toBeVisible();
+    const firstCardRef = await firstCard.locator('.booking-ref').textContent();
     
     // Click "View Details"
-    await page.getByRole('link', { name: 'View Details' }).first().click();
+    await firstCard.getByRole('link', { name: 'View Details' }).click();
     
     // Assert URL and content
     await expect(page).toHaveURL(/\/bookings\/\d+/);

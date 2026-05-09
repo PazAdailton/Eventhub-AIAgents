@@ -51,16 +51,30 @@ async function bookEvent(page) {
 }
 
 /**
+ * Waits for the bookings list page to finish loading (skeletons disappear).
+ */
+async function waitForBookingsToLoad(page) {
+  const bookingCards = page.getByTestId('booking-card');
+  const emptyState = page.getByText('No bookings yet');
+  
+  await Promise.race([
+    bookingCards.first().waitFor({ state: 'visible', timeout: 5000 }).catch(() => {}),
+    emptyState.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {})
+  ]);
+}
+
+/**
  * Clears all bookings. Safe to call when already empty.
  */
 async function clearBookings(page) {
   await page.goto(`${BASE_URL}/bookings`);
-  const alreadyEmpty = await page.getByText('No bookings yet').isVisible().catch(() => false);
-  if (alreadyEmpty) return;
+  await waitForBookingsToLoad(page);
+
+  if (await page.getByText('No bookings yet').isVisible()) return;
 
   page.once('dialog', (dialog) => dialog.accept());
   await page.getByRole('button', { name: /clear all bookings/i }).click();
-  await expect(page.getByText('No bookings yet')).toBeVisible();
+  await expect(page.getByText('No bookings yet')).toBeVisible({ timeout: 10000 });
 }
 
 // ── Test Suite ─────────────────────────────────────────────────────────────────
@@ -195,6 +209,7 @@ test.describe('Booking Management — Critical Happy Paths', () => {
     await expect(page.getByText('Booking cancelled successfully')).toBeVisible();
 
     // -- Step 7: Assert booking is no longer in the list --
+    await waitForBookingsToLoad(page);
     await expect(page.getByText('No bookings yet')).toBeVisible();
   });
 
