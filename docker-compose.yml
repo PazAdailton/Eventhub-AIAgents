@@ -1,0 +1,11 @@
+services:
+  playwright:
+    build: .
+    volumes:
+      - .:/app
+      - /app/node_modules
+    # Use the playwright report directory as a volume to see results locally
+      - ./playwright-report:/app/playwright-report
+      - ./test-results:/app/test-results
+    # Run tests and then exit
+    command: npx playwright test
