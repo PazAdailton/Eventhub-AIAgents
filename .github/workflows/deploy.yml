@@ -36,6 +36,15 @@ on:
   # Auto-deploy when code is merged (pushed) to main
   push:
     branches: [main]
+    paths-ignore:
+      - 'tests/**'
+      - 'e2e/**'
+      - 'playwright.config.ts'
+      - '.github/workflows/playwright.yml'
+      - 'docs/**'
+      - 'README.md'
+      - 'PROJECT_OVERVIEW.md'
+      - 'CLAUDE.md'
 
   # Allow on-demand deploys from the GitHub Actions UI
   workflow_dispatch:
